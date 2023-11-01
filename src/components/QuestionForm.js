@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 
-function QuestionForm(props) {
+function QuestionForm({onAddItem}) {
   const [formData, setFormData] = useState({
     prompt: "",
     answer1: "",
@@ -18,9 +18,27 @@ function QuestionForm(props) {
   }
 
   function handleSubmit(event) {
-    event.preventDefault();
-    console.log(formData);
-  }
+    event.preventDefault();  
+
+  
+     fetch("http://localhost:3000/questions",{
+      method:"POST",
+      headers:{
+        "Content-Type":"Application/json"
+      },
+      body:JSON.stringify(formData)
+     })
+     .then(resp =>resp.json())
+     .then(newItem=>onAddItem(newItem))
+
+     // Reset the form data after successful submission
+     setFormData({
+      prompt: "",
+      answers: ["", "", "", ""],
+      correctIndex: 0,
+    });
+    
+   }
 
   return (
     <section>
@@ -84,10 +102,14 @@ function QuestionForm(props) {
             <option value="3">{formData.answer4}</option>
           </select>
         </label>
-        <button type="submit">Add Question</button>
+        <button type="submit" >Add Question</button>
       </form>
     </section>
   );
 }
 
 export default QuestionForm;
+//POST /questions
+//When the user clicks the 'New Question' button, a form will be displayed for creating a new question. 
+//This form is already set up as a controlled form, 
+//so your responsibility will be to send this form data to our API when the form is submitted.
